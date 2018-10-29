@@ -3,12 +3,12 @@ import random
 from decimal import *
 
 
-
 class Dice():
     # assumes 6 sided
 
     def __init__(self, ap = False):
         self.sides = ["A","A","B","B","C","D"]
+        self.ap = ap
 
         if ap:
             self.sides = ["A", "B", "C", "D", "F", "F"]
@@ -20,6 +20,8 @@ class Dice():
             elif random_number == 4 or random_number == 5:
                 self.set_side6("D")
 
+    def get_ap(self):
+        return True
 
     def get_side6(self):
         return self.sides[5]
@@ -111,8 +113,8 @@ class Player():
                 gpa_total += Game.GPA_dict[current_roll]
         pre_gpa = Decimal(gpa_total) / Decimal(len(self.get_courses()))
 
-        #if self.get_aps() >= 3:
-         #   pre_gpa -= Game.ap_punish_dict[self.get_aps()]
+        if self.get_aps() >= 3:
+            pre_gpa -= Decimal(Game.ap_punish_dict[self.get_aps()])
         self.set_gpa(pre_gpa)
         return pre_gpa
 
@@ -124,6 +126,11 @@ class Game:
         self.players = []
         self.gpa = gpa
 
+    def get_gpa(self):
+        return self.gpa
+
+    def get_player_list(self):
+        return self.players
     def get_class_size(self):
         return len(self.players)
 
@@ -149,7 +156,7 @@ class Game:
 
         pre_gpa = Decimal(gpa_total) / Decimal(len(user.get_courses()))
         if user.get_aps() >= 3:
-            pre_gpa -= Game.ap_punish_dict[user.get_aps()]
+            pre_gpa -= Decimal(Game.ap_punish_dict[user.get_aps()])
         user.set_gpa(pre_gpa)
 
 
@@ -193,7 +200,7 @@ def simulation(regs, aps, class_size=1000000, winningGPA=4.0):
     print("average GPA of " + str(regs) + " regulars and " + str(aps) + " APs is " + str(class_gpa) +
           "\nthere was " + str(simul.count_acceptance()) + " accepted out of a class size of " +
           str(simul.get_class_size()) +
-          "\nthe percent accepted was " + str(simul.percent_acceptance()))
+          "\nthe probability accepted was " + str(simul.percent_acceptance()))
 
 
 '''
@@ -233,17 +240,69 @@ def simulator():
         print("\ncalculating odds...\n\n")
         simulation(regs, aps, class_size, min_gpa)
 
-simulator()
 
-
-'''
-def main(winningGPA = 4.0):
-    game = Game()
-
+def main(winning_gpa=4.0, course_number=6):
+    game = Game(winning_gpa)
+    courses = ["Calculus", "Statistics", "US Government", "Religion", "Basket Weaving", "World Literature",
+               "History of Shredded Cheese", "Biology", "Dance", "Asian History"]
     print("welcome to the MIT game!\n" +
           "the objective of the game is to get into MIT.\n" +
-          "you need to get a GPA of " + winningGPA + " to win")
-    player_count = int(input("how many players are there?"))
-    for i in range(player_count):
+          "you need to get a GPA of " + str(winning_gpa) + " to win")
+    player_count = int(input("how many players are there?\n? "))
+    player_index = 1
+    for j in range(player_count):
+        name = input("what is your name, player %s?\n? " % (player_index))
+        course_list = []
+        for i in range(course_number):
+            while True:
+                ap_yn = input("is class number " + str(i + 1) + " an AP?\nY/N? ")
+                if ap_yn == "Y":
+                    course_name = "AP " + courses[i % 10]
+                    course_list.append([course_name, True])
+                    break
+                elif ap_yn == "N":
+                    course_name = courses[i % 10]
+                    course_list.append([course_name, False])
+                    break
+                else:
+                    print("Please respond with either \"Y\" or \"N\".")
+            print(" the class " + course_name + " has been added")
+        game.add_player(name, course_list)
+        print("\nwelcome " + name + "!")
+        player_index += 1
 
-'''
+    print("\nnow that everyone has entered their info, we can begin receiving our grades.")
+    input("\nPress Enter to continue...")
+
+    class_gpa = game.get_class_GPA()
+    winners = []
+    for player in game.get_player_list():
+        print("\nhere are " + player.get_name() + "'s stats:")
+        for course in player.get_courses():
+            print("   " + course.get_name())
+            print("       grade: " + course.get_grade())
+        print("   gpa: " + str(player.get_gpa()))
+        if player.get_gpa() >= game.get_gpa():
+            winners.append(player)
+    input("\nPress Enter to continue...")
+    if len(winners) > 0:
+        mit_students = ""
+        for each in winners:
+            mit_students += "\n" + each.get_name()
+        print("\nhere's the list of mit hopefuls:" + mit_students)
+    else:
+        print("\nnobody got into mit :(")
+    # highest to lowest
+    sorted_gpa = sorted(game.get_player_list(), key=lambda x: x.get_gpa(), reverse=True)
+    for i in range(len(sorted_gpa)):
+        print("\nClass Rank: " + str(i+1))
+        print("Name: " + sorted_gpa[i].get_name())
+        print("GPA: " + str(sorted_gpa[i].get_gpa()))
+
+    input("\nPress Enter to continue...")
+    print("\nthe top student was %s, with a GPA of %s. The class' average GPA was %s."
+          % (sorted_gpa[0].get_name(), str(sorted_gpa[0].get_gpa()), str(class_gpa)))
+    print("\nThanks for playing!")
+# simulator()
+
+main(4.0, 2)
