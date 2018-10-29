@@ -307,4 +307,4 @@ def main(winning_gpa=4.0, course_number=6):
     print("\nThanks for playing!")
 # simulator()
 
-main(4.0, 2)
+main(4.0, 6)
