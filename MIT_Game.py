@@ -248,6 +248,8 @@ def main(winning_gpa=4.0, course_number=6):
     print("welcome to the MIT game!\n" +
           "the objective of the game is to get into MIT.\n" +
           "you need to get a GPA of " + str(winning_gpa) + " to win")
+    print("this game is dedicated to michael wang...")
+    input("\nPress Enter to continue...")
     player_count = int(input("how many players are there?\n? "))
     player_index = 1
     for j in range(player_count):
