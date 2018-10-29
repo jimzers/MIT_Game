@@ -11,13 +11,14 @@ class Dice():
         self.sides = ["A","A","B","B","C","D"]
 
         if ap:
-            random_number = random.randint(0,5)
+            self.sides = ["A", "B", "C", "D", "F", "F"]
+            random_number = random.randint(0, 5)
             if random_number == 0 or random_number == 1:
-                self.set_side6 = "B"
+                self.set_side6("B")
             elif random_number == 2 or random_number == 3:
-                self.set_side6 = "C"
+                self.set_side6("C")
             elif random_number == 4 or random_number == 5:
-                self.set_side6 = "D"
+                self.set_side6("D")
 
 
     def get_side6(self):
