@@ -61,9 +61,13 @@ class Player():
     # courses is just an array of arrays with name & boolean that corresponds to ap
     def __init__(self, name, courses_info):
         self.name = name
+        self.aps = 0
         self.courses = []
         for course in courses_info:
             self.courses.append(Course(course[0], course[1]))
+            if course[1]:
+                self.aps += 1
+
         self.gpa = 200000
         self.mit = False
 
@@ -78,6 +82,9 @@ class Player():
 
     def set_gpa(self, gpa):
         self.gpa = gpa
+
+    def get_aps(self):
+        return self.aps
 
     def get_acceptance(self):
         return self.mit
@@ -102,11 +109,16 @@ class Player():
                 gpa_total += Game.GPA_dict[current_roll] + 1
             else:
                 gpa_total += Game.GPA_dict[current_roll]
-        self.set_gpa(Decimal(gpa_total) / Decimal(len(self.get_courses())))
-        return self.get_gpa()
+        pre_gpa = Decimal(gpa_total) / Decimal(len(self.get_courses()))
+
+        #if self.get_aps() >= 3:
+         #   pre_gpa -= Game.ap_punish_dict[self.get_aps()]
+        self.set_gpa(pre_gpa)
+        return pre_gpa
 
 class Game:
     GPA_dict = {"A": 4, "B": 3, "C": 2, "D": 1, "F": 0}
+    ap_punish_dict = {3: 0.05, 4: 0.24, 5: 0.5, 6: 0.75}
     def __init__(self, gpa = 4.0):
         # GPA is required GPA to win
         self.players = []
@@ -134,7 +146,11 @@ class Game:
                 gpa_total += Game.GPA_dict[current_roll] + 1
             else:
                 gpa_total += Game.GPA_dict[current_roll]
-        user.gpa = Decimal(gpa_total) / Decimal(len(user.get_courses()))
+
+        pre_gpa = Decimal(gpa_total) / Decimal(len(user.get_courses()))
+        if user.get_aps() >= 3:
+            pre_gpa -= Game.ap_punish_dict[user.get_aps()]
+        user.set_gpa(pre_gpa)
 
 
     def mark_acceptance(self):
@@ -222,11 +238,12 @@ simulator()
 
 '''
 def main(winningGPA = 4.0):
-    winningGPA = dsljf;ljksdljsdkljdslkds;aj;
+    game = Game()
+
     print("welcome to the MIT game!\n" +
           "the objective of the game is to get into MIT.\n" +
           "you need to get a GPA of " + winningGPA + " to win")
-    while Tr
-
+    player_count = int(input("how many players are there?"))
+    for i in range(player_count):
 
 '''
